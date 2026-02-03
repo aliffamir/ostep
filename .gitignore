@@ -1,13 +1,15 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c,c++,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=c,c++,macos
 
-/ostep-homework
 
 ### C ###*
 # Executables
 *
 !*.*
 !*/
+
+# ignore ostep_homework repo
+ostep-homework/
 
 # Prerequisites
 *.d
