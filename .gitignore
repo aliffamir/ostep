@@ -3,7 +3,12 @@
 
 /ostep-homework
 
-### C ###
+### C ###*
+# Executables
+*
+!*.*
+!*/
+
 # Prerequisites
 *.d
 
