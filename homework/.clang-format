@@ -1,0 +1,5 @@
+BasedOnStyle: Microsoft
+PointerAlignment: Left
+SpaceBeforeAssignmentOperators: True
+IndentWidth: 4
+Cpp11BracedListStyle: False 
