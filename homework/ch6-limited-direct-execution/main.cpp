@@ -6,58 +6,37 @@
 
 int main()
 {
+    struct timeval tv1, tv2;
+
+    // measure cost of a system call
+    // time of a 0-byte read in microseconds
+    gettimeofday(&tv1, nullptr);
+    for (int i{ 0 }; i < 100000; i++)
+    {
+        read(0, nullptr, 0);
+    }
+    gettimeofday(&tv2, nullptr);
+
+    long delta_us = (tv2.tv_sec - tv1.tv_sec) * 1'000'000L + (tv2.tv_usec - tv1.tv_usec);
+    std::println("{} us / read", static_cast<double>(delta_us) / 100'000);
+
     struct timeval tv;
     struct timezone tz;
 
-    for (int i{}; i < 10; i++)
+    // average time gap between gettimeofday() calls in microseconds
+    long prev_us{ 0 };
+    long timeGapAcc{ 0 };
+    for (int i{}; i < 100000; i++)
     {
         gettimeofday(&tv, &tz);
-
-        std::println("Seconds since 1/1/1970: {}", tv.tv_sec);
-        std::println("Microseconds: {}", tv.tv_usec);
-        std::println("Minutes west of Greenwich: {}", tz.tz_minuteswest);
-        std::println("Daylight Saving Time adjustment: {}", tz.tz_dsttime);
-
-        std::println("");
+        long time_us { tv.tv_sec * 1'000'000 + tv.tv_usec };
+        if (i > 0)
+        {
+            timeGapAcc += time_us - prev_us;
+        }
+        prev_us = time_us;
     }
-
-    int pip[2];
-    if (pipe(pip) < 0)
-    {
-        std::println("pipe failed");
-        exit(1);
-    }
-
-    // child 1
-    int rc1 = fork();
-    if (rc1 < 0)
-    {
-        std::println("child 1 fork failed");
-        exit(1);
-    }
-    else if (rc1 == 0)
-    {
-        std::print("child 1 w/ pid {}", getpid());
-        write(pip[1], "writing", 7);
-    }
-
-    // child 2
-    int rc2 = fork();
-    if (rc2 < 0)
-    {
-        std::println("child 2 fork failed");
-        exit(1);
-    }
-    else if (rc2 == 0)
-    {
-        std::println("child 2 w/ pid {}", getpid());
-    }
-    else // parent
-    {
-        int rcWait1 = waitpid(rc1, nullptr, 0);
-        int rcWait2 = waitpid(rc2, nullptr, 0);
-        std::println("parent pid {}", getpid());
-    }
+    std::println("Average time gap between gettimeofday() calls: {} us", static_cast<double>(timeGapAcc) / 100000);
 
     return 0;
 }
